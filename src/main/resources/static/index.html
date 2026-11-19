@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoliCode</title>
+    <link rel="stylesheet" href="/styles.css?v=6">
+</head>
+
+<body>
+
+    <!-- ESCENA DE FONDO INTERACTIVA CON SCROLL: LUNA NOCTURNA + 4 OLAS PIXEL/SYNTHWAVE -->
+    <div class="escena-lunar" aria-hidden="true">
+        <div class="luna-nocturna"></div>
+        <div class="wave w1" id="ola-1"></div>
+        <div class="wave w2" id="ola-2"></div>
+        <div class="wave w3" id="ola-3"></div>
+        <div class="wave w4" id="ola-4"></div>
+    </div>
+
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR CON LOGO ANIMADO ROLICODE -->
+    <header class="navbar-animada">
+        <div class="brand-wrapper">
+            <!-- EMBLEMA ROLICODE EN 2 CAPAS: Espiral giratoria (360deg) + Cápsula Neón semitransparente -->
+            <div class="rolicode-logo" title="Pasa el cursor para acelerar el giro 360°">
+                <!-- Capa 1 (Fondo): Espiral continua de Arquímedes (50% Verde Lima / 50% Azul Eléctrico) -->
+                <svg class="rolicode-espiral" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Fondo circular Verde Lima -->
+                    <circle cx="50" cy="50" r="47" fill="#c6ff40" />
+                    <!-- Espiral con separación de 16 unidades entre vueltas y grosor de pincel 8 (mitad verde, mitad azul) -->
+                    <path d="M 50,50
+                             A 4,4 0 0,1 58,50
+                             A 12,12 0 0,1 34,50
+                             A 20,20 0 0,1 74,50
+                             A 28,28 0 0,1 18,50
+                             A 36,36 0 0,1 90,50
+                             A 44,44 0 0,1 2,50" fill="none" stroke="#1800b5" stroke-width="8"
+                        stroke-linecap="round" />
+                    <!-- Anillo exterior Azul Eléctrico -->
+                    <circle cx="50" cy="50" r="47" fill="none" stroke="#1800b5" stroke-width="5" />
+                </svg>
+                <!-- Capa 2 (Frente): Cápsula oscura con opacidad para dejar ver el giro detrás -->
+                <div class="rolicode-pill">
+                    <strong id="nav-empresa" class="rolicode-text">RoliCode</strong>
+                </div>
+            </div>
+        </div>
+        <nav>
+            <button class="tab-btn active" onclick="mostrarPestana('inicio', this)">Portafolio & Servicios</button>
+            <button class="tab-btn" onclick="mostrarPestana('demos', this)">Demos</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- PESTAÑA 1: LANDING PAGE DE SERVICIOS Y CONTACTO -->
+        <section id="vista-inicio">
+            <div class="hero">
+                <h1 id="hero-nombre">Cargando perfil...</h1>
+                <p id="hero-rol">Conectando con el Backend en Spring Boot...</p>
+                <p id="hero-bio" style="margin-top: 0.5rem; font-size: 0.98rem; color: var(--text);"></p>
+                <div id="hero-tech" style="margin-top: 0.85rem;"></div>
+            </div>
+
+            <h2 class="section-title">Mis Servicios de Desarrollo <small
+                    style="font-size:0.85rem; color:var(--muted); font-weight:normal;">(Haz clic en una tarjeta para
+                    desplegar)</small></h2>
+            <div id="contenedor-servicios" class="grid"></div>
+
+            <!-- FORMULARIO DE COTIZACIÓN / CONTACTO -->
+            <h2 class="section-title">Solicitar Cotización (Prueba tu Base de Datos SQL)</h2>
+            <form id="form-contacto" class="form-card" onsubmit="enviarFormularioContacto(event)">
+                <div class="form-grid">
+                    <div>
+                        <label>Tu Nombre / Empresa</label>
+                        <input type="text" id="input-nombre" placeholder="Ej. Ana Gómez" required>
+                    </div>
+                    <div>
+                        <label>Correo Electrónico</label>
+                        <input type="email" id="input-email" placeholder="ana@empresa.com" required>
+                    </div>
+                    <div>
+                        <label>Servicio de Interés</label>
+                        <select id="input-servicio">
+                            <option value="landingpage">Landing Page Profesional</option>
+                            <option value="onlineStore">Tienda en Línea (E-Commerce)</option>
+                            <option value="webApi">Desarrollo e Integración de APIs</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Presupuesto Estimado ($ MXN - Mín. $100)</label>
+                        <input type="number" id="input-presupuesto" placeholder="Ej. 500" step="0.01" required>
+                    </div>
+                </div>
+                <div>
+                    <label>Detalles del Proyecto</label>
+                    <textarea id="input-mensaje" rows="2" placeholder="Cuéntame qué necesitas construir..."
+                        required></textarea>
+                </div>
+                <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" id="check-privacidad" style="width: auto;" required>
+                    <label for="check-privacidad" style="margin: 0; font-size: 0.85rem;">
+                        He leído y acepto la <a href="javascript:void(0)" onclick="abrirModalLegal('privacidad')"
+                            style="color: var(--accent);">Política de Privacidad</a> y los <a href="javascript:void(0)"
+                            onclick="abrirModalLegal('terminos')" style="color: var(--accent);">Términos y
+                            Condiciones</a>.
+                    </label>
+                </div>
+                <button type="submit" class="btn-submit">Enviar y Guardar</button>
+            </form>
+
+            <h2 class="section-title">Solicitudes Recibidas en Base de Datos</h2>
+            <div id="lista-solicitudes" class="grid"></div>
+        </section>
+
+        <!-- PESTAÑA 2: LABORATORIO DE PROYECTOS DEMO -->
+        <section id="vista-demos" class="hidden">
+            <h2 class="section-title">Catálogo de Demos <small
+                    style="font-size:0.85rem; color:var(--muted); font-weight:normal;">(Selecciona un contenedor para
+                    abrir el Demo)</small></h2>
+            <div id="contenedor-demos" class="grid" style="margin-bottom: 2rem;"></div>
+
+            <!-- DEMO EN VIVO #1: OCULTO POR DEFECTO (class="hidden"), SOLO SE DESPLIEGA AL HACER CLIC EN SU TARJETA -->
+            <div id="panel-demo-inventario" class="hidden" style="border-top: 1px solid #334155; padding-top: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 class="section-title" style="margin: 0;">Demo Activo #1: Sistema de Inventario y Punto de
+                        Venta (POS)</h2>
+                    <button class="btn-sm btn-del" onclick="cerrarDemoInventario()">Cerrar Demo</button>
+                </div>
+
+                <!-- Indicadores Financieros y de Stock (KPIs) -->
+                <div class="kpi-grid">
+                    <div class="kpi-box">
+                        <div class="kpi-label">Productos Registrados</div>
+                        <div id="kpi-productos" class="kpi-value">0</div>
+                    </div>
+                    <div class="kpi-box">
+                        <div class="kpi-label">Unidades Totales en Bodega</div>
+                        <div id="kpi-unidades" class="kpi-value">0</div>
+                    </div>
+                    <div class="kpi-box">
+                        <div class="kpi-label">Ingresos por Ventas</div>
+                        <div id="kpi-ingresos" class="kpi-value" style="color: var(--accent-green);">$0.00</div>
+                    </div>
+                    <div class="kpi-box">
+                        <div class="kpi-label">Ganancia Neta Real</div>
+                        <div id="kpi-ganancia" class="kpi-value" style="color: var(--accent-amber);">$0.00</div>
+                    </div>
+                </div>
+
+                <!-- Barra de Búsqueda y Filtro de Stock Bajo (Query Methods de Uriel) -->
+                <div class="action-group" style="margin-bottom: 1rem; justify-content: space-between;">
+                    <div class="action-group" style="flex: 1; max-width: 450px;">
+                        <input type="text" id="input-buscar"
+                            placeholder="Buscar producto por nombre (ej. Teclado, Laptop)..."
+                            oninput="buscarProductosEnVivo()">
+                    </div>
+                    <div class="action-group">
+                        <button class="btn-sm btn-out" onclick="filtrarPorStockBajo()">Ver solo Stock Bajo (&lt;=
+                            5)</button>
+                        <button class="btn-sm btn-in" onclick="cargarInventarioYVentas()">Ver Todos</button>
+                    </div>
+                </div>
+
+                <!-- Tabla de Control de Stock, Entradas, Salidas y Ventas -->
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Producto</th>
+                                <th>Costo Compra</th>
+                                <th>Precio Venta</th>
+                                <th>Stock Actual</th>
+                                <th>Movimientos (Cantidad + Acción)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-productos"></tbody>
+                    </table>
+                </div>
+
+                <!-- Formulario para Dar de Alta un Producto Nuevo -->
+                <form id="form-producto" class="form-card" onsubmit="crearNuevoProducto(event)"
+                    style="margin-bottom: 2rem;">
+                    <h3 style="margin-bottom: 1rem; color: var(--accent);">Registrar Nuevo Producto en Almacén</h3>
+                    <div class="form-grid">
+                        <div>
+                            <label>Código SKU</label>
+                            <input type="text" id="prod-codigo" placeholder="Ej. AUD-04" required>
+                        </div>
+                        <div>
+                            <label>Nombre del Producto</label>
+                            <input type="text" id="prod-nombre" placeholder="Ej. Audífonos Bluetooth" required>
+                        </div>
+                        <div>
+                            <label>Costo Compra ($)</label>
+                            <input type="number" id="prod-compra" placeholder="Ej. 25.00" step="0.01" required>
+                        </div>
+                        <div>
+                            <label>Precio Venta ($)</label>
+                            <input type="number" id="prod-venta" placeholder="Ej. 45.00" step="0.01" required>
+                        </div>
+                        <div>
+                            <label>Stock Inicial</label>
+                            <input type="number" id="prod-stock" placeholder="Ej. 10" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit">Guardar Producto en SQL</button>
+                </form>
+
+                <!-- Historial de Tickets de Venta y Ganancias -->
+                <h3 style="margin-bottom: 0.8rem;">Historial de Ventas y Ganancias</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ticket #</th>
+                                <th>Producto Vendido</th>
+                                <th>Cantidad</th>
+                                <th>Total Cobrado</th>
+                                <th>Ganancia Neta</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-ventas"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- PANEL / MODAL LEGAL Y DE BAJA DE CORREOS (Cumplimiento LFPDPPP / GDPR) -->
+        <section id="modal-legal" class="form-card hidden" style="margin-top: 2rem; border-color: var(--accent);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <h3 id="titulo-modal-legal" style="color: var(--accent);">Información Legal</h3>
+                <button class="btn-sm btn-del" onclick="cerrarModalLegal()">Cerrar</button>
+            </div>
+            <div id="contenido-modal-legal" style="font-size: 0.92rem; color: var(--text);"></div>
+        </section>
+    </main>
+
+    <!-- PIE DE PÁGINA DE CUMPLIMIENTO LEGAL Y LICENCIAS -->
+    <footer
+        style="position: relative; z-index: 15; text-align: center; padding: 1.5rem; border-top: 1px solid #334155; background: rgba(15, 23, 42, 0.9); font-size: 0.85rem; color: var(--muted);">
+        <div style="display: flex; justify-content: center; gap: 1.2rem; flex-wrap: wrap; margin-bottom: 0.6rem;">
+            <a href="javascript:void(0)" onclick="abrirModalLegal('privacidad')"
+                style="color: var(--accent); text-decoration: none;">Política de Privacidad</a>
+            <a href="javascript:void(0)" onclick="abrirModalLegal('terminos')"
+                style="color: var(--accent); text-decoration: none;">Términos y Condiciones</a>
+            <a href="javascript:void(0)" onclick="abrirModalLegal('baja')"
+                style="color: #f87171; text-decoration: none;">Baja de Correos (Opt-Out / ARCO)</a>
+            <a href="javascript:void(0)" onclick="abrirModalLegal('licencias')"
+                style="color: var(--accent-green); text-decoration: none;">Licencias de Fuentes, Imágenes y
+                Logos</a>
+        </div>
+        <div>© 2026 <strong>RoliCode</strong> (Uriel) • Todos los activos gráficos (SVG/CSS) y fuentes del sistema son
+            100% libres de regalías para uso comercial.</div>
+    </footer>
+
+    <!-- BANNER DE CONSENTIMIENTO DE COOKIES -->
+    <div id="banner-cookies" class="hidden"
+        style="position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 50; width: 92%; max-width: 780px; background: rgba(15, 23, 42, 0.96); border: 1px solid var(--accent); border-radius: 12px; padding: 1rem 1.4rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; box-shadow: 0 8px 30px rgba(0,0,0,0.7); flex-wrap: wrap;">
+        <div style="flex: 1; font-size: 0.86rem; color: var(--text);">
+            <strong>Aviso de Cookies en RoliCode:</strong> Utilizamos únicamente almacenamiento técnico local (sin
+            rastreadores publicitarios de terceros) para recordar tu preferencia de privacidad y mejorar tu experiencia
+            en nuestros Demos.
+            <a href="javascript:void(0)" onclick="abrirModalLegal('privacidad')" style="color: var(--accent);">Ver
+                Política</a>.
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+            <button class="btn-sm btn-sell" onclick="aceptarCookies('todas')">Aceptar Cookies</button>
+            <button class="btn-sm btn-in" onclick="aceptarCookies('esenciales')">Solo Esenciales</button>
+        </div>
+    </div>
+
+    <script src="/app.js?v=7"></script>
+</body>
+
+</html>

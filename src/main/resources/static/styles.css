@@ -1,0 +1,511 @@
+:root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --accent: #38bdf8;
+    --accent-green: #4ade80;
+    --accent-amber: #facc15;
+    --accent-red: #f87171;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+}
+
+header {
+    background: rgba(30, 41, 59, 0.92);
+    border-bottom: 1px solid #334155;
+    padding: 0.35rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.badge-estado {
+    background: rgba(74, 222, 128, 0.15);
+    color: var(--accent-green);
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+nav {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.tab-btn {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid #334155;
+    padding: 0.5rem 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.tab-btn.active,
+.tab-btn:hover {
+    background: var(--accent);
+    color: #0f172a;
+    border-color: var(--accent);
+}
+
+main {
+    max-width: 1080px;
+    margin: 2.5rem auto;
+    padding: 0 1.5rem;
+}
+
+.hero {
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-radius: 16px;
+    border: 1px solid #334155;
+    margin-bottom: 2.5rem;
+}
+
+.hero h1 {
+    font-size: 2.4rem;
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+}
+
+.hero p {
+    font-size: 1.15rem;
+    color: var(--muted);
+}
+
+.section-title {
+    font-size: 1.45rem;
+    margin: 2rem 0 1.2rem;
+    border-left: 4px solid var(--accent);
+    padding-left: 0.75rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+}
+
+.card-code {
+    font-size: 0.8rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card h3 {
+    margin: 0.4rem 0 0.6rem;
+    font-size: 1.25rem;
+}
+
+.card p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+.status-tag {
+    display: inline-block;
+    font-size: 0.8rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.status-ready {
+    background: rgba(74, 222, 128, 0.2);
+    color: #4ade80;
+}
+
+.status-wip {
+    background: rgba(250, 204, 21, 0.2);
+    color: #facc15;
+}
+
+.status-low {
+    background: rgba(248, 113, 113, 0.2);
+    color: #f87171;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Formularios y Tablas del Sistema de Inventario */
+.form-card {
+    background: var(--card);
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 0.35rem;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #475569;
+    background: #0f172a;
+    color: var(--text);
+    font-size: 0.95rem;
+}
+
+.btn-submit {
+    background: var(--accent-green);
+    color: #0f172a;
+    border: none;
+    padding: 0.7rem 1.4rem;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 0.5rem;
+}
+
+.btn-submit:hover {
+    opacity: 0.9;
+}
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.kpi-box {
+    background: var(--card);
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 1.1rem 1.3rem;
+}
+
+.kpi-label {
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-transform: uppercase;
+}
+
+.kpi-value {
+    font-size: 1.7rem;
+    font-weight: 700;
+    margin-top: 0.2rem;
+    color: var(--accent);
+}
+
+.table-wrap {
+    background: var(--card);
+    border: 1px solid #334155;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th,
+td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid #334155;
+    font-size: 0.93rem;
+}
+
+th {
+    background: rgba(15, 23, 42, 0.6);
+    color: var(--muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.action-group {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.qty-input {
+    width: 62px;
+    padding: 0.35rem 0.45rem;
+    text-align: center;
+}
+
+.btn-sm {
+    border: none;
+    padding: 0.4rem 0.7rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    cursor: pointer;
+}
+
+.btn-in {
+    background: rgba(56, 189, 248, 0.2);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+}
+
+.btn-out {
+    background: rgba(250, 204, 21, 0.2);
+    color: var(--accent-amber);
+    border: 1px solid var(--accent-amber);
+}
+
+.btn-sell {
+    background: var(--accent-green);
+    color: #0f172a;
+}
+
+.btn-del {
+    background: rgba(248, 113, 113, 0.2);
+    color: var(--accent-red);
+    border: 1px solid var(--accent-red);
+}
+
+/* =========================================================================
+   ANIMACIONES DE LA BARRA DE NAVEGACIÓN Y LOGO ROLICODE (Lección 14)
+   ========================================================================= */
+
+.brand-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Contenedor relativo que une la Espiral (fondo) y la Cápsula Negra (frente) */
+.rolicode-logo {
+    position: relative;
+    width: 145px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* Capa 1: La espiral circular con el giro de 360 grados (rotate(360deg)) de Uriel */
+.rolicode-espiral {
+    position: absolute;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    box-shadow: 0 0 14px rgba(198, 255, 64, 0.45);
+    animation: giroEspiral 8s linear infinite;
+    /* Gira 360° suavemente todo el tiempo */
+    transition: transform 0.6s ease, box-shadow 0.3s ease;
+}
+
+/* Cuando pasas el cursor, la espiral acelera y brilla más */
+.rolicode-logo:hover .rolicode-espiral {
+    animation-duration: 1.5s;
+    box-shadow: 0 0 24px rgba(198, 255, 64, 0.9), 0 0 35px rgba(24, 0, 181, 0.8);
+}
+
+/* Fotogramas clave (@keyframes) usando tu respuesta: rotate(360deg) */
+@keyframes giroEspiral {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Capa 2: Cápsula ovalada con opacidad (rgba) para dejar ver el espiral girando detrás */
+.rolicode-pill {
+    position: relative;
+    z-index: 2;
+    /* rgba(rojo, verde, azul, OPACIDAD): 0.58 permite ver la espiral a través de la cápsula */
+    background: rgba(5, 5, 5, 0.58);
+    backdrop-filter: blur(1.5px);
+    padding: 0.15rem 0.85rem;
+    border-radius: 999px;
+    border: 1.5px solid rgba(255, 255, 255, 0.22);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.rolicode-logo:hover .rolicode-pill {
+    transform: scale(1.07);
+}
+
+/* Efecto Neón 3D (Cian #00f0ff + Magenta #ff00c8) idéntico a tu imagen de RoliCode */
+.rolicode-text {
+    font-size: 1.25rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #ffffff;
+    text-shadow:
+        -2px -1px 0px #00f0ff,
+        2px 1px 0px #ff00c8,
+        0px 0px 8px rgba(0, 240, 255, 0.6);
+}
+
+/* Latido verde tipo radar para la insignia "Disponible" */
+@keyframes pulsoDisponible {
+    0% {
+        box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6);
+    }
+
+    70% {
+        box-shadow: 0 0 0 9px rgba(74, 222, 128, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+    }
+}
+
+.badge-estado {
+    animation: pulsoDisponible 2s infinite;
+}
+
+/* =========================================================================
+   ESCENA DE FONDO CON SCROLL: LUNA LLENA NOCTURNA + OLAS PIXEL (Lección 15)
+   ========================================================================= */
+
+:root {
+    --luna-brillo: #f8fafc;
+    --luna-crater: #cbd5e1;
+    --halo-lunar: rgba(56, 189, 248, 0.22);
+    --ola-1-top: #7dd3fc;
+    --ola-1-bot: #38bdf8;
+    --ola-2-top: #38bdf8;
+    --ola-2-bot: #0284c7;
+    --ola-3-top: #0284c7;
+    --ola-3-bot: #1e3a8a;
+    --ola-4-top: #1e3a8a;
+    --ola-4-bot: #0f172a;
+}
+
+header {
+    z-index: 20;
+    backdrop-filter: blur(8px);
+}
+
+main {
+    position: relative;
+    z-index: 10;
+    padding-bottom: 35vh;
+}
+
+.hero, .card, .form-card, .kpi-box, .table-wrap {
+    background: rgba(30, 41, 59, 0.84);
+    backdrop-filter: blur(6px);
+}
+
+.escena-lunar {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    background: radial-gradient(
+        circle at 50% 34vh,
+        var(--halo-lunar) 0%,
+        rgba(15, 23, 42, 0.92) 45%,
+        #090d16 100%
+    );
+}
+
+.luna-nocturna {
+    position: absolute;
+    left: 50%;
+    top: 14vh;
+    transform: translateX(-50%);
+    width: 34vh;
+    height: 34vh;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle at 35% 35%,
+        #ffffff 0%,
+        var(--luna-brillo) 45%,
+        var(--luna-crater) 85%,
+        #94a3b8 100%
+    );
+    box-shadow:
+        0 0 40px rgba(248, 250, 252, 0.55),
+        0 0 90px rgba(56, 189, 248, 0.35),
+        0 0 150px rgba(56, 189, 248, 0.18);
+    opacity: 0.88;
+    transition: transform 0.15s ease-out;
+}
+
+.wave {
+    position: fixed;
+    inset: auto 0 0 0;
+    height: 55vh;
+    display: flex;
+    align-items: flex-end;
+    opacity: 0.55;
+}
+
+.w1 { z-index: 1; --c1: var(--ola-1-top); --c2: var(--ola-1-bot); }
+.w2 { z-index: 2; --c1: var(--ola-2-top); --c2: var(--ola-2-bot); }
+.w3 { z-index: 3; --c1: var(--ola-3-top); --c2: var(--ola-3-bot); }
+.w4 { z-index: 4; --c1: var(--ola-4-top); --c2: var(--ola-4-bot); }
+
+.wave i {
+    --px: 8px;
+    flex: 1;
+    background: linear-gradient(var(--c1), var(--c2));
+    -webkit-mask-image: repeating-linear-gradient(
+        0deg, #000 0 calc(var(--px) - 2px), transparent 0 var(--px)
+    );
+    mask-image: repeating-linear-gradient(
+        0deg, #000 0 calc(var(--px) - 2px), transparent 0 var(--px)
+    );
+    transition: height 0.06s linear;
+}
