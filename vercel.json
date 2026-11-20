@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "https://rolicode-api-production.up.railway.app/$1"
+    }
+  ]
+}
