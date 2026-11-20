@@ -1,19 +1,25 @@
-// Función para cambiar entre la pestaña de Portafolio y la de Demos
+// Función para cambiar entre la pestaña de Portafolio, Demos y Panel Admin
 function mostrarPestana(nombrePestana, boton) {
     document.getElementById('vista-inicio').classList.toggle('hidden', nombrePestana !== 'inicio');
     document.getElementById('vista-demos').classList.toggle('hidden', nombrePestana !== 'demos');
+    const vistaAdmin = document.getElementById('vista-admin');
+    if (vistaAdmin) {
+        vistaAdmin.classList.toggle('hidden', nombrePestana !== 'admin');
+    }
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     boton.classList.add('active');
 
     // Al entrar a la pestaña de Demos, mantenemos los demos cerrados hasta que el usuario haga clic en uno
     if (nombrePestana === 'demos') {
         cerrarDemoInventario();
+        cerrarDemoCotizador();
+        cerrarDemoDivisas();
     }
 }
 
 // Al abrir la página, el Navegador carga los datos del Portafolio y del Sistema de Inventario
 async function cargarDatosDesdeSpringBoot() {
-    // 1. Pedir Perfil (incluyendo biografia y tecnologias agregadas por Uriel) -> GET /api/portafolio/perfil
+    // Pedir Perfil (incluyendo biografia y tecnologias agregadas por Uriel) -> GET /api/portafolio/perfil
     const resPerfil = await fetch('/api/portafolio/perfil');
     const perfil = await resPerfil.json();
     document.getElementById('nav-empresa').textContent = perfil.empresa;
@@ -32,7 +38,7 @@ async function cargarDatosDesdeSpringBoot() {
             .join('');
     }
 
-    // 2. Pedir Servicios -> GET /api/portafolio/servicios
+    // Pedir Servicios -> GET /api/portafolio/servicios
     // La descripción empieza oculta (class="hidden") y se despliega al hacer clic en el contenedor
     const resServicios = await fetch('/api/portafolio/servicios');
     const servicios = await resServicios.json();
@@ -46,7 +52,7 @@ async function cargarDatosDesdeSpringBoot() {
         </div>
     `).join('');
 
-    // 3. Pedir Demos -> GET /api/portafolio/demos
+    // Pedir Demos -> GET /api/portafolio/demos
     // Al hacer clic en el contenedor de un Demo activo, se despliega ese Demo abajo
     const resDemos = await fetch('/api/portafolio/demos');
     const demos = await resDemos.json();
@@ -60,8 +66,7 @@ async function cargarDatosDesdeSpringBoot() {
         </div>
     `).join('');
 
-    // 4. Cargar Solicitudes de Contacto y preparar los datos del Inventario
-    await cargarSolicitudesGuardadas();
+    // Preparar los datos del Inventario (Las solicitudes de clientes ahora están protegidas en Panel Admin)
     await cargarInventarioYVentas();
 }
 
@@ -79,43 +84,145 @@ function seleccionarDemo(idDemo, activo) {
         alert('Este proyecto demo está en construcción. Pronto estará disponible.');
         return;
     }
-    if (idDemo === 1) {
-        const panel = document.getElementById('panel-demo-inventario');
-        if (panel) {
-            panel.classList.toggle('hidden');
-            if (!panel.classList.contains('hidden')) {
-                panel.scrollIntoView({ behavior: 'smooth' });
-            }
+    const panelInv = document.getElementById('panel-demo-inventario');
+    const panelCot = document.getElementById('panel-demo-cotizador');
+    const panelDiv = document.getElementById('panel-demo-divisas');
+
+    if (idDemo === 1 && panelInv) {
+        if (panelCot) panelCot.classList.add('hidden');
+        if (panelDiv) panelDiv.classList.add('hidden');
+        panelInv.classList.toggle('hidden');
+        if (!panelInv.classList.contains('hidden')) {
+            panelInv.scrollIntoView({ behavior: 'smooth' });
+        }
+    } else if (idDemo === 2 && panelCot) {
+        if (panelInv) panelInv.classList.add('hidden');
+        if (panelDiv) panelDiv.classList.add('hidden');
+        panelCot.classList.toggle('hidden');
+        if (!panelCot.classList.contains('hidden')) {
+            calcularPresupuestoEnJava();
+            panelCot.scrollIntoView({ behavior: 'smooth' });
+        }
+    } else if (idDemo === 3 && panelDiv) {
+        if (panelInv) panelInv.classList.add('hidden');
+        if (panelCot) panelCot.classList.add('hidden');
+        panelDiv.classList.toggle('hidden');
+        if (!panelDiv.classList.contains('hidden')) {
+            convertirDivisaEnJava();
+            panelDiv.scrollIntoView({ behavior: 'smooth' });
         }
     }
 }
 
 function cerrarDemoInventario() {
     const panel = document.getElementById('panel-demo-inventario');
-    if (panel) {
-        panel.classList.add('hidden');
+    if (panel) panel.classList.add('hidden');
+}
+
+function cerrarDemoCotizador() {
+    const panel = document.getElementById('panel-demo-cotizador');
+    if (panel) panel.classList.add('hidden');
+}
+
+function cerrarDemoDivisas() {
+    const panel = document.getElementById('panel-demo-divisas');
+    if (panel) panel.classList.add('hidden');
+}
+
+// Llama al endpoint @GetMapping("/divisas") en PortafolioController (Demo #3 de Uriel)
+async function convertirDivisaEnJava(evento) {
+    if (evento) evento.preventDefault();
+    const montoMxn = parseFloat(document.getElementById('div-monto-mxn').value) || 0;
+    const moneda = document.getElementById('div-moneda').value;
+
+    const url = `/api/portafolio/divisas?montoMxn=${montoMxn}&monedaDestino=${encodeURIComponent(moneda)}`;
+    const res = await fetch(url);
+    if (res.ok) {
+        const data = await res.json();
+        const montoFormateado = Number(data.montoConvertido).toLocaleString('es-MX', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+        document.getElementById('resultado-divisa').textContent = `$${montoFormateado} ${data.monedaDestino}`;
+        document.getElementById('detalle-tasa-divisa').textContent = `Tasa aplicada en Java 21: 1 ${data.monedaDestino} = $${data.tasaAplicada} MXN`;
     }
 }
 
-// Consulta las solicitudes en la Base de Datos
-async function cargarSolicitudesGuardadas() {
-    const res = await fetch('/api/portafolio/contacto');
-    const solicitudes = await res.json();
-    const contenedor = document.getElementById('lista-solicitudes');
+// Llama al endpoint @GetMapping("/cotizar") en PortafolioController (calculado en MXN)
+async function calcularPresupuestoEnJava(evento) {
+    if (evento) evento.preventDefault();
+    const tipo = document.getElementById('cot-tipo').value;
+    const modulos = parseInt(document.getElementById('cot-modulos').value) || 0;
+    const incluyeBd = document.getElementById('cot-bd').checked;
+    const urgente = document.getElementById('cot-urgente').checked;
 
-    if (solicitudes.length === 0) {
-        contenedor.innerHTML = '<p style="color: var(--muted);">Aún no hay solicitudes registradas en la Base de Datos.</p>';
-        return;
+    const url = `/api/portafolio/cotizar?tipoProyecto=${encodeURIComponent(tipo)}&modulosExtra=${modulos}&incluyeBd=${incluyeBd}&urgente=${urgente}`;
+    const res = await fetch(url);
+    if (res.ok) {
+        const data = await res.json();
+        const montoFormateado = Number(data.totalEstimado).toLocaleString('es-MX', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+        document.getElementById('resultado-cotizacion').textContent = `$${montoFormateado} ${data.moneda}`;
     }
+}
 
-    contenedor.innerHTML = solicitudes.map(sol => `
-        <div class="card">
-            <span class="card-code">Ticket SQL #${sol.id} • ${sol.servicioInteres}</span>
-            <h3>${sol.nombreCliente} (${sol.email})</h3>
-            <p>${sol.mensaje}</p>
-            <span class="status-tag status-ready">Presupuesto: $${sol.presupuesto} USD</span>
-        </div>
-    `).join('');
+// Desbloquea el Panel de Administrador enviando la clave para que Java verifique el Hash SHA-256
+async function desbloquearPanelAdmin(evento) {
+    if (evento) evento.preventDefault();
+    const clave = document.getElementById('input-clave-admin').value;
+    const msgEstado = document.getElementById('mensaje-estado-admin');
+    const cajaLogin = document.getElementById('caja-login-admin');
+    const panelPrivado = document.getElementById('contenedor-privado-admin');
+
+    const res = await fetch(`/api/portafolio/contacto?clave=${encodeURIComponent(clave)}`);
+    if (res.ok) {
+        const solicitudes = await res.json();
+        // Ocultamos el cuadro de login y abrimos la pantalla completa del Dashboard de Admin
+        if (cajaLogin) cajaLogin.classList.add('hidden');
+        panelPrivado.classList.remove('hidden');
+        msgEstado.textContent = '';
+
+        const contenedor = document.getElementById('lista-solicitudes');
+        if (solicitudes.length === 0) {
+            contenedor.innerHTML = `
+                <div class="card">
+                    <h3>Bandeja de Entrada Limpia</h3>
+                    <p>Actualmente hay 0 solicitudes de cotización registradas en tu base de datos de Supabase. Envía una desde la pestaña "Portafolio & Servicios" para verla aparecer aquí.</p>
+                </div>
+            `;
+        } else {
+            contenedor.innerHTML = solicitudes.map(sol => `
+                <div class="card">
+                    <span class="card-code">Ticket SQL #${sol.id} • ${sol.servicioInteres}</span>
+                    <h3>${sol.nombreCliente} (${sol.email})</h3>
+                    <p>${sol.mensaje}</p>
+                    <span class="status-tag status-ready">Presupuesto: $${sol.presupuesto} MXN</span>
+                </div>
+            `).join('');
+        }
+    } else {
+        panelPrivado.classList.add('hidden');
+        msgEstado.style.color = 'var(--accent-red)';
+        msgEstado.textContent = 'Acceso denegado: Clave incorrecta o sistema bloqueado temporalmente por 15 minutos.';
+    }
+}
+
+function cerrarSesionAdmin() {
+    const cajaLogin = document.getElementById('caja-login-admin');
+    const panelPrivado = document.getElementById('contenedor-privado-admin');
+    document.getElementById('input-clave-admin').value = '';
+    if (panelPrivado) panelPrivado.classList.add('hidden');
+    if (cajaLogin) cajaLogin.classList.remove('hidden');
+}
+
+async function cargarSolicitudesGuardadas() {
+    // Si el panel de admin ya está desbloqueado, refrescamos las solicitudes
+    const panelPrivado = document.getElementById('contenedor-privado-admin');
+    if (panelPrivado && !panelPrivado.classList.contains('hidden')) {
+        await desbloquearPanelAdmin();
+    }
 }
 
 // Envía una nueva solicitud de contacto mediante POST /api/portafolio/contacto
@@ -159,8 +266,8 @@ async function cargarInventarioYVentas() {
     const totalIngresos = ventas.reduce((acc, v) => acc + v.totalVenta, 0);
     const totalGanancia = ventas.reduce((acc, v) => acc + v.gananciaNeta, 0);
 
-    document.getElementById('kpi-productos').textContent = productos.length;
-    document.getElementById('kpi-unidades').textContent = totalUnidades;
+    document.getElementById('kpi-productos').textContent = productos.length + ' modelos';
+    document.getElementById('kpi-unidades').textContent = totalUnidades + ' piezas';
     document.getElementById('kpi-ingresos').textContent = '$' + totalIngresos.toFixed(2);
     document.getElementById('kpi-ganancia').textContent = '$' + totalGanancia.toFixed(2);
 
@@ -174,7 +281,7 @@ async function cargarInventarioYVentas() {
             <tr>
                 <td>#${v.id}</td>
                 <td>${v.nombreProducto}</td>
-                <td>${v.cantidad} uds</td>
+                <td>${v.cantidad} piezas</td>
                 <td style="color: var(--accent-green); font-weight:600;">$${v.totalVenta.toFixed(2)}</td>
                 <td style="color: var(--accent-amber); font-weight:600;">+$${v.gananciaNeta.toFixed(2)}</td>
             </tr>
@@ -191,7 +298,7 @@ function pintarTablaProductos(productos) {
             <td><strong>$${p.precioVenta.toFixed(2)}</strong></td>
             <td>
                 <span class="status-tag ${p.stockActual <= 5 ? 'status-low' : 'status-ready'}">
-                    ${p.stockActual} uds ${p.stockActual <= 5 ? '(Bajo)' : ''}
+                    ${p.stockActual} piezas (${p.codigo}) ${p.stockActual <= 5 ? '- Pocas piezas' : ''}
                 </span>
             </td>
             <td>

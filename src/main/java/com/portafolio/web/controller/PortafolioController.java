@@ -4,6 +4,8 @@ import com.portafolio.web.model.ProyectoDemo;
 import com.portafolio.web.model.Servicio;
 import com.portafolio.web.model.SolicitudContacto;
 import com.portafolio.web.service.PortafolioService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,16 +16,16 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
-// 1. @RestController: Le dice a Spring que esta clase es el "Mesero" (Controller)
+// @RestController: Le dice a Spring que esta clase es el "Mesero" (Controller)
 @RestController
-// 2. @RequestMapping: Ruta base para todas las peticiones de este controlador
+// @RequestMapping: Ruta base para todas las peticiones de este controlador
 @RequestMapping("/api/portafolio")
 public class PortafolioController {
 
-    // 3. El Mesero declara que necesita al Chef (PortafolioService)
+    // El Mesero declara que necesita al Chef (PortafolioService)
     private final PortafolioService portafolioService;
 
-    // 4. Inyección de Dependencias por Constructor: Spring conecta al Chef
+    // Inyección de Dependencias por Constructor: Spring conecta al Chef
     // automáticamente
     public PortafolioController(PortafolioService portafolioService) {
         this.portafolioService = portafolioService;
@@ -35,7 +37,7 @@ public class PortafolioController {
         return Map.of(
                 "nombre", "Uriel",
                 "rol",
-                "Somos una desarrolladores comprometidos con mejorar siempre, nos especializamos en desarrollo de aplicaciones web, mobiles y de escritorio",
+                "Somos una empresa desarrolladores comprometidos con mejorar siempre, nos especializamos en desarrollo de aplicaciones web, mobiles y de escritorio",
                 "estado", "Disponible",
                 "empresa", "RoliCode");
     }
@@ -60,11 +62,18 @@ public class PortafolioController {
         return portafolioService.guardarSolicitud(solicitud);
     }
 
-    // Endpoint 5: Consultar todas las solicitudes guardadas -> GET
-    // /api/portafolio/contacto
+    // Endpoint 5 (Protegido con Hash SHA-256 + Bloqueo 15 min): Consultar
+    // solicitudes -> GET /api/portafolio/contacto?clave=...
     @GetMapping("/contacto")
-    public List<SolicitudContacto> listarSolicitudes() {
-        return portafolioService.obtenerSolicitudes();
+    public ResponseEntity<?> listarSolicitudes(@RequestParam String clave) {
+        try {
+            List<SolicitudContacto> lista = portafolioService.obtenerSolicitudes(clave);
+            return ResponseEntity.ok(lista);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(Map.of("error", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
+        }
     }
 
     // Endpoint 6 (Cumplimiento Legal ARCO/GDPR): Baja de correo electrónico ->
@@ -75,5 +84,26 @@ public class PortafolioController {
         return Map.of(
                 "mensaje", "Tu correo y datos asociados fueron eliminados exitosamente de nuestra base de datos.",
                 "registrosEliminados", eliminados);
+    }
+
+    // Endpoint 7 (Demo #2 - Calculadora de Cotizaciones en MXN):
+    // GET
+    // /api/portafolio/cotizar?tipoProyecto=onlineStore&modulosExtra=2&incluyeBd=true&urgente=false
+    @GetMapping("/cotizar")
+    public Map<String, Object> cotizarProyecto(
+            @RequestParam String tipoProyecto,
+            @RequestParam(defaultValue = "0") int modulosExtra,
+            @RequestParam(defaultValue = "false") boolean incluyeBd,
+            @RequestParam(defaultValue = "false") boolean urgente) {
+        return portafolioService.calcularCotizacionDemo(tipoProyecto, modulosExtra, incluyeBd, urgente);
+    }
+
+    // Endpoint 8 (Demo #3 - Conversor de Divisas en Java 21):
+    // GET /api/portafolio/divisas?montoMxn=5000&monedaDestino=USD
+    @GetMapping("/divisas")
+    public Map<String, Object> convertirDivisa(
+            @RequestParam(defaultValue = "1000") double montoMxn,
+            @RequestParam(defaultValue = "USD") String monedaDestino) {
+        return portafolioService.convertirDivisaDemo(montoMxn, monedaDestino);
     }
 }

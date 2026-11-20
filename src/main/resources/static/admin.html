@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consola Privada de Administración | RoliCode</title>
+    <link rel="stylesheet" href="/styles.css?v=9">
+</head>
+<body>
+
+    <header class="navbar-animada">
+        <div class="brand-wrapper">
+            <div class="rolicode-pill">
+                <strong class="rolicode-text">RoliCode Admin</strong>
+            </div>
+        </div>
+        <nav>
+            <a href="/" class="tab-btn" style="text-decoration: none;">Volver al Portafolio Público</a>
+        </nav>
+    </header>
+
+    <main>
+        <h2 class="section-title">Consola Privada de Administración — RoliCode</h2>
+
+        <!-- PANTALLA 1: LOGIN DE ADMINISTRADOR -->
+        <div id="caja-login-admin" class="form-card" style="max-width: 500px; margin: 2rem auto;">
+            <h3 style="margin-bottom: 0.5rem; color: var(--accent);">Autenticación SHA-256</h3>
+            <p style="color: var(--muted); margin-bottom: 1.2rem; font-size: 0.9rem;">
+                Ruta privada de administración. Después de 3 intentos fallidos, el servidor bloqueará el acceso durante 15 minutos.
+            </p>
+            <form onsubmit="autenticarAdmin(event)">
+                <div style="margin-bottom: 1rem;">
+                    <label>Contraseña de Administrador</label>
+                    <input type="password" id="input-clave-admin" placeholder="Ingresa tu contraseña secreta..." required>
+                </div>
+                <button type="submit" class="btn-submit" style="width: 100%;">Ingresar al Dashboard</button>
+            </form>
+            <p id="mensaje-estado-admin" style="margin-top: 0.85rem; font-size: 0.9rem;"></p>
+        </div>
+
+        <!-- PANTALLA 2: DASHBOARD INTERNO (SE MUESTRA AL VALIDAR EL HASH SHA-256) -->
+        <div id="contenedor-privado-admin" class="hidden">
+            <div class="form-card" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-color: var(--accent-green);">
+                <div>
+                    <strong style="color: var(--accent-green); font-size: 1.1rem;">Sesión de Administrador Activa — RoliCode</strong>
+                    <p style="color: var(--muted); font-size: 0.85rem;">Conectado a Supabase (Hash SHA-256 verificado).</p>
+                </div>
+                <div style="display: flex; gap: 0.6rem;">
+                    <button class="btn-sm btn-in" onclick="autenticarAdmin()">Actualizar Bandeja</button>
+                    <button class="btn-sm btn-del" onclick="cerrarSesion()">Cerrar Sesión</button>
+                </div>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-box">
+                    <div class="kpi-label">Solicitudes de Clientes en Supabase</div>
+                    <div id="kpi-total-solicitudes" class="kpi-value">0</div>
+                </div>
+            </div>
+
+            <h2 class="section-title">Solicitudes de Cotización Recibidas</h2>
+            <div id="lista-solicitudes" class="grid"></div>
+        </div>
+    </main>
+
+    <script>
+        async function autenticarAdmin(evento) {
+            if (evento) evento.preventDefault();
+            const clave = document.getElementById('input-clave-admin').value;
+            const msgEstado = document.getElementById('mensaje-estado-admin');
+            const cajaLogin = document.getElementById('caja-login-admin');
+            const panelPrivado = document.getElementById('contenedor-privado-admin');
+
+            const res = await fetch(`/api/portafolio/contacto?clave=${encodeURIComponent(clave)}`);
+            if (res.ok) {
+                const solicitudes = await res.json();
+                cajaLogin.classList.add('hidden');
+                panelPrivado.classList.remove('hidden');
+                msgEstado.textContent = '';
+                document.getElementById('kpi-total-solicitudes').textContent = solicitudes.length;
+
+                const contenedor = document.getElementById('lista-solicitudes');
+                if (solicitudes.length === 0) {
+                    contenedor.innerHTML = `
+                        <div class="card">
+                            <h3>Bandeja de Entrada Limpia</h3>
+                            <p>Actualmente hay 0 solicitudes de cotización registradas en Supabase. Cuando un cliente envíe el formulario en la página pública, aparecerá aquí.</p>
+                        </div>
+                    `;
+                } else {
+                    contenedor.innerHTML = solicitudes.map(sol => `
+                        <div class="card">
+                            <span class="card-code">Ticket SQL #${sol.id} • ${sol.servicioInteres}</span>
+                            <h3>${sol.nombreCliente} (${sol.email})</h3>
+                            <p>${sol.mensaje}</p>
+                            <span class="status-tag status-ready">Presupuesto: $${sol.presupuesto} MXN</span>
+                        </div>
+                    `).join('');
+                }
+            } else {
+                const errData = await res.json().catch(() => ({}));
+                msgEstado.style.color = 'var(--accent-red)';
+                msgEstado.textContent = errData.error || 'Acceso denegado: Contraseña incorrecta.';
+            }
+        }
+
+        function cerrarSesion() {
+            document.getElementById('input-clave-admin').value = '';
+            document.getElementById('contenedor-privado-admin').classList.add('hidden');
+            document.getElementById('caja-login-admin').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

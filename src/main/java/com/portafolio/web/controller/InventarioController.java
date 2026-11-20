@@ -23,55 +23,59 @@ public class InventarioController {
         this.inventarioService = inventarioService;
     }
 
-    // 1. Listar todo el stock actual -> GET /api/inventario/productos
+    // Listar todo el stock actual -> GET /api/inventario/productos
     @GetMapping("/productos")
     public List<Producto> obtenerProductos() {
         return inventarioService.listarProductos();
     }
 
-    // 2. Crear un nuevo producto -> POST /api/inventario/productos
+    // Crear un nuevo producto -> POST /api/inventario/productos
     @PostMapping("/productos")
     public Producto agregarProducto(@RequestBody Producto producto) {
         return inventarioService.crearProducto(producto);
     }
 
-    // 3. Registrar una ENTRADA de almacén -> POST /api/inventario/entrada?idProducto=1&cantidad=5
+    // Registrar una ENTRADA de almacén -> POST
+    // /api/inventario/entrada?idProducto=1&cantidad=5
     @PostMapping("/entrada")
     public Producto entradaAlmacen(@RequestParam Long idProducto, @RequestParam int cantidad) {
         return inventarioService.registrarEntrada(idProducto, cantidad);
     }
 
-    // 4. Registrar una SALIDA de almacén -> POST /api/inventario/salida?idProducto=1&cantidad=2
+    // Registrar una SALIDA de almacén -> POST
+    // /api/inventario/salida?idProducto=1&cantidad=2
     @PostMapping("/salida")
     public Producto salidaAlmacen(@RequestParam Long idProducto, @RequestParam int cantidad) {
         return inventarioService.registrarSalida(idProducto, cantidad);
     }
 
-    // 5. Registrar una VENTA (descuenta stock y calcula ganancia) -> POST /api/inventario/venta?idProducto=1&cantidad=1
+    // Registrar una VENTA (descuenta stock y calcula ganancia) -> POST
+    // /api/inventario/venta?idProducto=1&cantidad=1
     @PostMapping("/venta")
     public Venta realizarVenta(@RequestParam Long idProducto, @RequestParam int cantidad) {
         return inventarioService.registrarVenta(idProducto, cantidad);
     }
 
-    // 6. Consultar el historial de ventas y ganancias -> GET /api/inventario/ventas
+    // Consultar el historial de ventas y ganancias -> GET /api/inventario/ventas
     @GetMapping("/ventas")
     public List<Venta> obtenerHistorialVentas() {
         return inventarioService.listarVentas();
     }
 
-    // 7. Eliminar un producto (Programado por Uriel) -> DELETE /api/inventario/productos?idProducto=1
+    // Eliminar un producto (Programado por Uriel) -> DELETE
+    // /api/inventario/productos?idProducto=1
     @DeleteMapping("/productos")
     public void borrarProducto(@RequestParam Long idProducto) {
         inventarioService.eliminarProducto(idProducto);
     }
 
-    // 8. Buscar productos por nombre -> GET /api/inventario/buscar?texto=teclado
+    // Buscar productos por nombre -> GET /api/inventario/buscar?texto=teclado
     @GetMapping("/buscar")
     public List<Producto> buscarProductos(@RequestParam String texto) {
         return inventarioService.buscarPorNombre(texto);
     }
 
-    // 9. Filtrar productos con stock bajo -> GET /api/inventario/stock-bajo?limite=5
+    // Filtrar productos con stock bajo -> GET /api/inventario/stock-bajo?limite=5
     @GetMapping("/stock-bajo")
     public List<Producto> obtenerStockBajo(@RequestParam(defaultValue = "5") int limite) {
         return inventarioService.filtrarStockBajo(limite);

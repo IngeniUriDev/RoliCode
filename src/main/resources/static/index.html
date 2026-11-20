@@ -108,9 +108,47 @@
                 </div>
                 <button type="submit" class="btn-submit">Enviar y Guardar</button>
             </form>
+        </section>
 
-            <h2 class="section-title">Solicitudes Recibidas en Base de Datos</h2>
-            <div id="lista-solicitudes" class="grid"></div>
+        <!-- PESTAÑA 3: PANEL PRIVADO DE ADMINISTRADOR (PROTEGIDO CON HASH SHA-256 Y BLOQUEO 15 MIN) -->
+        <section id="vista-admin" class="hidden">
+            <h2 class="section-title">Panel Privado de Administración — RoliCode</h2>
+
+            <!-- PANTALLA 1: FORMULARIO DE ACCESO (SE OCULTA AL ENTRAR) -->
+            <div id="caja-login-admin" class="form-card"
+                style="margin-bottom: 1.5rem; max-width: 520px; margin-left: auto; margin-right: auto;">
+                <h3 style="margin-bottom: 0.5rem; color: var(--accent);">Iniciar Sesión de Administrador</h3>
+                <p style="color: var(--muted); margin-bottom: 1rem; font-size: 0.9rem;">
+                    Acceso protegido mediante Hash Criptográfico SHA-256. Un intento fallido bloqueará el acceso durante
+                    15 minutos.
+                </p>
+                <form onsubmit="desbloquearPanelAdmin(event)">
+                    <div style="margin-bottom: 1rem;">
+                        <label>Contraseña de Administrador</label>
+                        <input type="password" id="input-clave-admin" placeholder="Ingresa tu clave secreta..."
+                            required>
+                    </div>
+                    <button type="submit" class="btn-submit" style="width: 100%;">Ingresar al Panel</button>
+                </form>
+                <p id="mensaje-estado-admin" style="margin-top: 0.75rem; font-size: 0.9rem;"></p>
+            </div>
+
+            <!-- PANTALLA 2: DASHBOARD DEL ADMINISTRADOR (SE ABRE AL VALIDAR LA CONTRASEÑA) -->
+            <div id="contenedor-privado-admin" class="hidden">
+                <div class="form-card"
+                    style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-color: var(--accent-green);">
+                    <div>
+                        <strong style="color: var(--accent-green); font-size: 1.1rem;">Sesión de Administrador Activa —
+                            RoliCode</strong>
+                        <p style="color: var(--muted); font-size: 0.85rem;">Conectado a la Base de Datos en Supabase
+                            (Hash SHA-256 verificado).</p>
+                    </div>
+                    <button class="btn-sm btn-del" onclick="cerrarSesionAdmin()">Cerrar Sesión</button>
+                </div>
+
+                <h2 class="section-title">Solicitudes de Cotización Recibidas</h2>
+                <div id="lista-solicitudes" class="grid"></div>
+            </div>
         </section>
 
         <!-- PESTAÑA 2: LABORATORIO DE PROYECTOS DEMO -->
@@ -128,15 +166,15 @@
                     <button class="btn-sm btn-del" onclick="cerrarDemoInventario()">Cerrar Demo</button>
                 </div>
 
-                <!-- Indicadores Financieros y de Stock (KPIs) -->
+                <!-- Indicadores Financieros y de Piezas (KPIs) -->
                 <div class="kpi-grid">
                     <div class="kpi-box">
-                        <div class="kpi-label">Productos Registrados</div>
+                        <div class="kpi-label">Modelos Registrados</div>
                         <div id="kpi-productos" class="kpi-value">0</div>
                     </div>
                     <div class="kpi-box">
-                        <div class="kpi-label">Unidades Totales en Bodega</div>
-                        <div id="kpi-unidades" class="kpi-value">0</div>
+                        <div class="kpi-label">Piezas por Modelo (Total Bodega)</div>
+                        <div id="kpi-unidades" class="kpi-value">0 pzs</div>
                     </div>
                     <div class="kpi-box">
                         <div class="kpi-label">Ingresos por Ventas</div>
@@ -152,27 +190,28 @@
                 <div class="action-group" style="margin-bottom: 1rem; justify-content: space-between;">
                     <div class="action-group" style="flex: 1; max-width: 450px;">
                         <input type="text" id="input-buscar"
-                            placeholder="Buscar producto por nombre (ej. Teclado, Laptop)..."
+                            placeholder="Buscar modelo por nombre (ej. Teclado, Laptop)..."
                             oninput="buscarProductosEnVivo()">
                     </div>
                     <div class="action-group">
-                        <button class="btn-sm btn-out" onclick="filtrarPorStockBajo()">Ver solo Stock Bajo (&lt;=
+                        <button class="btn-sm btn-out" onclick="filtrarPorStockBajo()">Ver Modelos con Pocas Piezas
+                            (&lt;=
                             5)</button>
                         <button class="btn-sm btn-in" onclick="cargarInventarioYVentas()">Ver Todos</button>
                     </div>
                 </div>
 
-                <!-- Tabla de Control de Stock, Entradas, Salidas y Ventas -->
+                <!-- Tabla de Control de Piezas por Modelo, Entradas, Salidas y Ventas -->
                 <div class="table-wrap">
                     <table>
                         <thead>
                             <tr>
-                                <th>Código</th>
-                                <th>Producto</th>
+                                <th>Código Modelo</th>
+                                <th>Nombre del Modelo</th>
                                 <th>Costo Compra</th>
                                 <th>Precio Venta</th>
-                                <th>Stock Actual</th>
-                                <th>Movimientos (Cantidad + Acción)</th>
+                                <th>Piezas por Modelo</th>
+                                <th>Movimientos (Piezas + Acción)</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-productos"></tbody>
@@ -182,14 +221,14 @@
                 <!-- Formulario para Dar de Alta un Producto Nuevo -->
                 <form id="form-producto" class="form-card" onsubmit="crearNuevoProducto(event)"
                     style="margin-bottom: 2rem;">
-                    <h3 style="margin-bottom: 1rem; color: var(--accent);">Registrar Nuevo Producto en Almacén</h3>
+                    <h3 style="margin-bottom: 1rem; color: var(--accent);">Registrar Nuevo Modelo en Almacén</h3>
                     <div class="form-grid">
                         <div>
-                            <label>Código SKU</label>
+                            <label>Código de Modelo (SKU)</label>
                             <input type="text" id="prod-codigo" placeholder="Ej. AUD-04" required>
                         </div>
                         <div>
-                            <label>Nombre del Producto</label>
+                            <label>Nombre del Modelo</label>
                             <input type="text" id="prod-nombre" placeholder="Ej. Audífonos Bluetooth" required>
                         </div>
                         <div>
@@ -201,11 +240,11 @@
                             <input type="number" id="prod-venta" placeholder="Ej. 45.00" step="0.01" required>
                         </div>
                         <div>
-                            <label>Stock Inicial</label>
+                            <label>Número de Piezas Iniciales</label>
                             <input type="number" id="prod-stock" placeholder="Ej. 10" required>
                         </div>
                     </div>
-                    <button type="submit" class="btn-submit">Guardar Producto en SQL</button>
+                    <button type="submit" class="btn-submit">Guardar Modelo en SQL</button>
                 </form>
 
                 <!-- Historial de Tickets de Venta y Ganancias -->
@@ -215,14 +254,111 @@
                         <thead>
                             <tr>
                                 <th>Ticket #</th>
-                                <th>Producto Vendido</th>
-                                <th>Cantidad</th>
+                                <th>Modelo Vendido</th>
+                                <th>Piezas Vendidas</th>
                                 <th>Total Cobrado</th>
                                 <th>Ganancia Neta</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-ventas"></tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- DEMO EN VIVO #2: CALCULADORA DE COTIZACIONES EN MXN (OCULTO POR DEFECTO) -->
+            <div id="panel-demo-cotizador" class="hidden" style="border-top: 1px solid #334155; padding-top: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 class="section-title" style="margin: 0;">Demo Activo #2: Calculadora de Cotizaciones (MXN)</h2>
+                    <button class="btn-sm btn-del" onclick="cerrarDemoCotizador()">Cerrar Demo</button>
+                </div>
+
+                <div class="form-card">
+                    <p style="color: var(--muted); margin-bottom: 1.2rem;">
+                        Simulador interactivo conectado al motor financiero en Java (<code>PortafolioService</code>).
+                        Configura las opciones de tu proyecto para calcular la inversión estimada en Pesos Mexicanos:
+                    </p>
+                    <form id="form-cotizador" onsubmit="calcularPresupuestoEnJava(event)">
+                        <div class="form-grid">
+                            <div>
+                                <label>Tipo de Sistema / Proyecto</label>
+                                <select id="cot-tipo" onchange="calcularPresupuestoEnJava(event)">
+                                    <option value="landingpage">Landing Page Profesional (Base $2,500 MXN)</option>
+                                    <option value="onlineStore">Tienda en Línea E-Commerce (Base $7,500 MXN)</option>
+                                    <option value="posSystem">Sistema de Inventario / POS (Base $9,500 MXN)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Módulos o Secciones Extra (+$800 MXN c/u)</label>
+                                <input type="number" id="cot-modulos" value="0" min="0" max="20"
+                                    oninput="calcularPresupuestoEnJava(event)" required>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 2rem; flex-wrap: wrap; margin: 1rem 0;">
+                            <label
+                                style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--text);">
+                                <input type="checkbox" id="cot-bd" style="width: auto;"
+                                    onchange="calcularPresupuestoEnJava(event)">
+                                Incluir Base de Datos SQL / Cloud (+$2,000 MXN)
+                            </label>
+                            <label
+                                style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--text);">
+                                <input type="checkbox" id="cot-urgente" style="width: auto;"
+                                    onchange="calcularPresupuestoEnJava(event)">
+                                Entrega Urgente Prioritaria (+20%)
+                            </label>
+                        </div>
+
+                        <div class="kpi-box"
+                            style="margin-top: 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                            <div>
+                                <div class="kpi-label">Inversión Estimada (Calculada por Spring Boot)</div>
+                                <div id="resultado-cotizacion" class="kpi-value"
+                                    style="color: var(--accent-green); font-size: 2rem;">$2,500.00 MXN</div>
+                            </div>
+                            <button type="submit" class="btn-submit" style="margin: 0;">Recalcular en Servidor</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- DEMO EN VIVO #3: CONVERSOR DE DIVISAS EN JAVA 21 (OCULTO POR DEFECTO) -->
+            <div id="panel-demo-divisas" class="hidden" style="border-top: 1px solid #334155; padding-top: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 class="section-title" style="margin: 0;">Demo Activo #3: Conversor de Divisas (MXN a Divisas Globales)</h2>
+                    <button class="btn-sm btn-del" onclick="cerrarDemoDivisas()">Cerrar Demo</button>
+                </div>
+
+                <div class="form-card">
+                    <p style="color: var(--muted); margin-bottom: 1.2rem;">
+                        Conversor financiero impulsado por expresiones <code>switch</code> de Java 21 en <code>PortafolioService</code>. Ingresa un monto en Pesos Mexicanos (MXN) y selecciona la divisa destino:
+                    </p>
+                    <form onsubmit="convertirDivisaEnJava(event)">
+                        <div class="form-grid">
+                            <div>
+                                <label>Monto en Pesos Mexicanos ($ MXN)</label>
+                                <input type="number" id="div-monto-mxn" value="5000" min="0" step="0.01" oninput="convertirDivisaEnJava(event)" required>
+                            </div>
+                            <div>
+                                <label>Moneda Destino</label>
+                                <select id="div-moneda" onchange="convertirDivisaEnJava(event)">
+                                    <option value="USD">USD — Dólar Estadounidense (Tasa: $20.15 MXN)</option>
+                                    <option value="EUR">EUR — Euro Unión Europea (Tasa: $21.60 MXN)</option>
+                                    <option value="CAD">CAD — Dólar Canadiense (Tasa: $14.50 MXN)</option>
+                                    <option value="GBP">GBP — Libra Esterlina (Tasa: $25.40 MXN)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="kpi-box" style="margin-top: 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                            <div>
+                                <div class="kpi-label">Equivalente Convertido por Java 21</div>
+                                <div id="resultado-divisa" class="kpi-value" style="color: var(--accent); font-size: 2rem;">$248.14 USD</div>
+                                <small id="detalle-tasa-divisa" style="color: var(--muted);">Tasa aplicada: 1 USD = $20.15 MXN</small>
+                            </div>
+                            <button type="submit" class="btn-submit" style="margin: 0;">Convertir en Servidor</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </section>
@@ -252,7 +388,7 @@
                 Logos</a>
         </div>
         <div>© 2026 <strong>RoliCode</strong> (Uriel) • Todos los activos gráficos (SVG/CSS) y fuentes del sistema son
-            100% libres de regalías para uso comercial.</div>
+            100% libres para uso comercial.</div>
     </footer>
 
     <!-- BANNER DE CONSENTIMIENTO DE COOKIES -->
@@ -271,7 +407,7 @@
         </div>
     </div>
 
-    <script src="/app.js?v=7"></script>
+    <script src="/app.js?v=10"></script>
 </body>
 
 </html>

@@ -37,4 +37,7 @@ datos/
 *.mv.db
 *.trace.db
 .env
+src/main/resources/application-supabase.properties
+src/main/resources/application-postgres.properties
+
 
