@@ -28,6 +28,7 @@ public class SecurityHeadersFilter extends OncePerRequestFilter {
                 "font-src 'self'; " +
                 "connect-src 'self'; " +
                 "frame-ancestors 'none'; " +
+                "form-action 'self'; " +
                 "object-src 'none'; " +
                 "base-uri 'self';");
 
