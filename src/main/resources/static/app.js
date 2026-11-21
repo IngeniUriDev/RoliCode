@@ -1,15 +1,10 @@
-// Función para cambiar entre la pestaña de Portafolio, Demos y Panel Admin
+// Función para cambiar entre la pestaña de Portafolio y la pestaña de Demos
 function mostrarPestana(nombrePestana, boton) {
     document.getElementById('vista-inicio').classList.toggle('hidden', nombrePestana !== 'inicio');
     document.getElementById('vista-demos').classList.toggle('hidden', nombrePestana !== 'demos');
-    const vistaAdmin = document.getElementById('vista-admin');
-    if (vistaAdmin) {
-        vistaAdmin.classList.toggle('hidden', nombrePestana !== 'admin');
-    }
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     boton.classList.add('active');
 
-    // Al entrar a la pestaña de Demos, mantenemos los demos cerrados hasta que el usuario haga clic en uno
     if (nombrePestana === 'demos') {
         cerrarDemoInventario();
         cerrarDemoCotizador();
@@ -66,7 +61,7 @@ async function cargarDatosDesdeSpringBoot() {
         </div>
     `).join('');
 
-    // Preparar los datos del Inventario (Las solicitudes de clientes ahora están protegidas en Panel Admin)
+    // Preparar los datos del Inventario
     await cargarInventarioYVentas();
 }
 
@@ -168,63 +163,6 @@ async function calcularPresupuestoEnJava(evento) {
     }
 }
 
-// Desbloquea el Panel de Administrador enviando la clave para que Java verifique el Hash SHA-256
-async function desbloquearPanelAdmin(evento) {
-    if (evento) evento.preventDefault();
-    const clave = document.getElementById('input-clave-admin').value;
-    const msgEstado = document.getElementById('mensaje-estado-admin');
-    const cajaLogin = document.getElementById('caja-login-admin');
-    const panelPrivado = document.getElementById('contenedor-privado-admin');
-
-    const res = await fetch(`/api/portafolio/contacto?clave=${encodeURIComponent(clave)}`);
-    if (res.ok) {
-        const solicitudes = await res.json();
-        // Ocultamos el cuadro de login y abrimos la pantalla completa del Dashboard de Admin
-        if (cajaLogin) cajaLogin.classList.add('hidden');
-        panelPrivado.classList.remove('hidden');
-        msgEstado.textContent = '';
-
-        const contenedor = document.getElementById('lista-solicitudes');
-        if (solicitudes.length === 0) {
-            contenedor.innerHTML = `
-                <div class="card">
-                    <h3>Bandeja de Entrada Limpia</h3>
-                    <p>Actualmente hay 0 solicitudes de cotización registradas en tu base de datos de Supabase. Envía una desde la pestaña "Portafolio & Servicios" para verla aparecer aquí.</p>
-                </div>
-            `;
-        } else {
-            contenedor.innerHTML = solicitudes.map(sol => `
-                <div class="card">
-                    <span class="card-code">Ticket SQL #${sol.id} • ${sol.servicioInteres}</span>
-                    <h3>${sol.nombreCliente} (${sol.email})</h3>
-                    <p>${sol.mensaje}</p>
-                    <span class="status-tag status-ready">Presupuesto: $${sol.presupuesto} MXN</span>
-                </div>
-            `).join('');
-        }
-    } else {
-        panelPrivado.classList.add('hidden');
-        msgEstado.style.color = 'var(--accent-red)';
-        msgEstado.textContent = 'Acceso denegado: Clave incorrecta o sistema bloqueado temporalmente por 15 minutos.';
-    }
-}
-
-function cerrarSesionAdmin() {
-    const cajaLogin = document.getElementById('caja-login-admin');
-    const panelPrivado = document.getElementById('contenedor-privado-admin');
-    document.getElementById('input-clave-admin').value = '';
-    if (panelPrivado) panelPrivado.classList.add('hidden');
-    if (cajaLogin) cajaLogin.classList.remove('hidden');
-}
-
-async function cargarSolicitudesGuardadas() {
-    // Si el panel de admin ya está desbloqueado, refrescamos las solicitudes
-    const panelPrivado = document.getElementById('contenedor-privado-admin');
-    if (panelPrivado && !panelPrivado.classList.contains('hidden')) {
-        await desbloquearPanelAdmin();
-    }
-}
-
 // Envía una nueva solicitud de contacto mediante POST /api/portafolio/contacto
 async function enviarFormularioContacto(evento) {
     evento.preventDefault();
@@ -244,7 +182,6 @@ async function enviarFormularioContacto(evento) {
 
     if (respuesta.ok) {
         document.getElementById('form-contacto').reset();
-        await cargarSolicitudesGuardadas();
         alert('¡Solicitud guardada con éxito en la Base de Datos SQL!');
     } else {
         alert('Regla del Chef (Service): El presupuesto mínimo aceptado es de $100 USD.');
@@ -513,7 +450,6 @@ async function ejecutarBajaDeCorreo(evento) {
         const data = await res.json();
         alert(`${data.mensaje} (Registros eliminados: ${data.registrosEliminados})`);
         cerrarModalLegal();
-        await cargarSolicitudesGuardadas();
     } else {
         alert('No se encontró ningún registro activo con ese correo electrónico en la base de datos.');
     }

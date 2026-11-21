@@ -110,47 +110,6 @@
             </form>
         </section>
 
-        <!-- PESTAÑA 3: PANEL PRIVADO DE ADMINISTRADOR (PROTEGIDO CON HASH SHA-256 Y BLOQUEO 15 MIN) -->
-        <section id="vista-admin" class="hidden">
-            <h2 class="section-title">Panel Privado de Administración — RoliCode</h2>
-
-            <!-- PANTALLA 1: FORMULARIO DE ACCESO (SE OCULTA AL ENTRAR) -->
-            <div id="caja-login-admin" class="form-card"
-                style="margin-bottom: 1.5rem; max-width: 520px; margin-left: auto; margin-right: auto;">
-                <h3 style="margin-bottom: 0.5rem; color: var(--accent);">Iniciar Sesión de Administrador</h3>
-                <p style="color: var(--muted); margin-bottom: 1rem; font-size: 0.9rem;">
-                    Acceso protegido mediante Hash Criptográfico SHA-256. Un intento fallido bloqueará el acceso durante
-                    15 minutos.
-                </p>
-                <form onsubmit="desbloquearPanelAdmin(event)">
-                    <div style="margin-bottom: 1rem;">
-                        <label>Contraseña de Administrador</label>
-                        <input type="password" id="input-clave-admin" placeholder="Ingresa tu clave secreta..."
-                            required>
-                    </div>
-                    <button type="submit" class="btn-submit" style="width: 100%;">Ingresar al Panel</button>
-                </form>
-                <p id="mensaje-estado-admin" style="margin-top: 0.75rem; font-size: 0.9rem;"></p>
-            </div>
-
-            <!-- PANTALLA 2: DASHBOARD DEL ADMINISTRADOR (SE ABRE AL VALIDAR LA CONTRASEÑA) -->
-            <div id="contenedor-privado-admin" class="hidden">
-                <div class="form-card"
-                    style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-color: var(--accent-green);">
-                    <div>
-                        <strong style="color: var(--accent-green); font-size: 1.1rem;">Sesión de Administrador Activa —
-                            RoliCode</strong>
-                        <p style="color: var(--muted); font-size: 0.85rem;">Conectado a la Base de Datos en Supabase
-                            (Hash SHA-256 verificado).</p>
-                    </div>
-                    <button class="btn-sm btn-del" onclick="cerrarSesionAdmin()">Cerrar Sesión</button>
-                </div>
-
-                <h2 class="section-title">Solicitudes de Cotización Recibidas</h2>
-                <div id="lista-solicitudes" class="grid"></div>
-            </div>
-        </section>
-
         <!-- PESTAÑA 2: LABORATORIO DE PROYECTOS DEMO -->
         <section id="vista-demos" class="hidden">
             <h2 class="section-title">Catálogo de Demos <small
